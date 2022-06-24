@@ -25,7 +25,7 @@ int main(int argc, char const* argv[])
 
 	// Forcefully attaching socket to the port 8080
 	if (setsockopt(server_fd, SOL_SOCKET,
-				SO_REUSEADDR | SO_REUSEPORT, &opt,
+				SO_REUSEADDR, &opt,
 				sizeof(opt))) {
 		perror("setsockopt");
 		exit(EXIT_FAILURE);
@@ -45,18 +45,19 @@ int main(int argc, char const* argv[])
 		perror("listen");
 		exit(EXIT_FAILURE);
 	}
-	if ((new_socket
-		= accept(server_fd, (struct sockaddr*)&address,
-				(socklen_t*)&addrlen))
-		< 0) {
-		perror("accept");
-		exit(EXIT_FAILURE);
-	}
-	valread = read(new_socket, buffer, 1024);
-	printf("%s\n", buffer);
-	send(new_socket, hello, strlen(hello), 0);
-	printf("Hello message sent\n");
-
+    while (1)
+    {
+        printf("waiting for sth\n");
+        if ((new_socket = accept(server_fd, (struct sockaddr*)&address, (socklen_t*)&addrlen)) < 0) {
+            perror("accept");
+            exit(EXIT_FAILURE);
+        }
+        valread = read(new_socket, buffer, 1024);
+        printf("%s\n", buffer);
+        send(new_socket, hello, strlen(hello), 0);
+        printf("Hello message sent\n");
+    }
+    
 // closing the connected socket
 	close(new_socket);
 // closing the listening socket
